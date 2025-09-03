@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import config from "./config"; // ✅ import config
 
-const API_URL = "http://localhost:1191/products"; // your backend
+const API_URL = `${config.url}/products`; // ✅ use config url
 
 function ProductManager() {
   const [products, setProducts] = useState([]);
@@ -54,7 +55,14 @@ function ProductManager() {
   };
 
   const resetForm = () => {
-    setForm({ id: null, name: "", price: "", description: "", stock: "", category: "" });
+    setForm({
+      id: null,
+      name: "",
+      price: "",
+      description: "",
+      stock: "",
+      category: "",
+    });
   };
 
   return (
@@ -99,7 +107,11 @@ function ProductManager() {
           onChange={handleChange}
         />
         <button type="submit">{form.id ? "Update" : "Add"} Product</button>
-        {form.id && <button onClick={resetForm} type="button">Cancel</button>}
+        {form.id && (
+          <button onClick={resetForm} type="button">
+            Cancel
+          </button>
+        )}
       </form>
 
       {/* Product List */}
