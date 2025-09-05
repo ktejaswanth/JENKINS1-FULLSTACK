@@ -32,13 +32,16 @@ function ProductManager() {
     e.preventDefault();
 
     if (form.id) {
-      // Update
-      axios.put(`${API_URL}/${form.id}`, form).then(() => {
-        loadProducts();
-        resetForm();
-      });
+      // ✅ UPDATE CASE
+      axios
+        .put(`${API_URL}/${form.id}`, form) // <-- if backend uses @PutMapping("/products/{id}")
+        // axios.put(API_URL, form) // <-- if backend uses @PutMapping("/products")
+        .then(() => {
+          loadProducts();
+          resetForm();
+        });
     } else {
-      // Create
+      // ✅ CREATE CASE
       axios.post(API_URL, form).then(() => {
         loadProducts();
         resetForm();
@@ -47,7 +50,15 @@ function ProductManager() {
   };
 
   const handleEdit = (product) => {
-    setForm(product);
+    // ✅ ensure correct id key
+    setForm({
+      id: product.id || product._id,
+      name: product.name,
+      price: product.price,
+      description: product.description,
+      stock: product.stock,
+      category: product.category,
+    });
   };
 
   const handleDelete = (id) => {
@@ -118,12 +129,18 @@ function ProductManager() {
       <h3>Products</h3>
       <ul>
         {products.map((p) => (
-          <li key={p.id}>
+          <li key={p.id || p._id}>
             <b>{p.name}</b> - ₹{p.price} - {p.category} - Stock: {p.stock}
-            <button onClick={() => handleEdit(p)} style={{ marginLeft: "10px" }}>
+            <button
+              onClick={() => handleEdit(p)}
+              style={{ marginLeft: "10px" }}
+            >
               Edit
             </button>
-            <button onClick={() => handleDelete(p.id)} style={{ marginLeft: "10px" }}>
+            <button
+              onClick={() => handleDelete(p.id || p._id)}
+              style={{ marginLeft: "10px" }}
+            >
               Delete
             </button>
           </li>
