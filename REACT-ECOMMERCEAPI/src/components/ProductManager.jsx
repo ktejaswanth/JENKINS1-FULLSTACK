@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import config from "./config"; // ✅ import config
+import config from "./config"; 
 
-const API_URL = `${config.url}/products`; // ✅ use config url
+const API_URL = `${config.url}/productapi`; 
 
 function ProductManager() {
   const [products, setProducts] = useState([]);
@@ -21,7 +21,7 @@ function ProductManager() {
   }, []);
 
   const loadProducts = () => {
-    axios.get(API_URL).then((res) => setProducts(res.data));
+    axios.get(`${API_URL}/all`).then((res) => setProducts(res.data));
   };
 
   const handleChange = (e) => {
@@ -32,17 +32,14 @@ function ProductManager() {
     e.preventDefault();
 
     if (form.id) {
-      // ✅ UPDATE CASE
-      axios
-        .put(`${API_URL}/${form.id}`, form) // <-- if backend uses @PutMapping("/products/{id}")
-        // axios.put(API_URL, form) // <-- if backend uses @PutMapping("/products")
-        .then(() => {
-          loadProducts();
-          resetForm();
-        });
+      // Update
+      axios.put(`${API_URL}/update`, form).then(() => {
+        loadProducts();
+        resetForm();
+      });
     } else {
-      // ✅ CREATE CASE
-      axios.post(API_URL, form).then(() => {
+      // Create
+      axios.post(`${API_URL}/add`, form).then(() => {
         loadProducts();
         resetForm();
       });
@@ -50,19 +47,11 @@ function ProductManager() {
   };
 
   const handleEdit = (product) => {
-    // ✅ ensure correct id key
-    setForm({
-      id: product.id || product._id,
-      name: product.name,
-      price: product.price,
-      description: product.description,
-      stock: product.stock,
-      category: product.category,
-    });
+    setForm(product);
   };
 
   const handleDelete = (id) => {
-    axios.delete(`${API_URL}/${id}`).then(() => loadProducts());
+    axios.delete(`${API_URL}/delete/${id}`).then(() => loadProducts());
   };
 
   const resetForm = () => {
@@ -129,18 +118,12 @@ function ProductManager() {
       <h3>Products</h3>
       <ul>
         {products.map((p) => (
-          <li key={p.id || p._id}>
+          <li key={p.id}>
             <b>{p.name}</b> - ₹{p.price} - {p.category} - Stock: {p.stock}
-            <button
-              onClick={() => handleEdit(p)}
-              style={{ marginLeft: "10px" }}
-            >
+            <button onClick={() => handleEdit(p)} style={{ marginLeft: "10px" }}>
               Edit
             </button>
-            <button
-              onClick={() => handleDelete(p.id || p._id)}
-              style={{ marginLeft: "10px" }}
-            >
+            <button onClick={() => handleDelete(p.id)} style={{ marginLeft: "10px" }}>
               Delete
             </button>
           </li>
